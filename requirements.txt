@@ -1,0 +1,2 @@
+websocket-client
+pieces_os_client == 1.2.7
