@@ -1,8 +1,7 @@
 ## WEBSOCKET FUNCTIONS 
-import json
 import websocket
 import threading
-import pieces_os_client
+import pieces_os_client as pos_client
 
 WEBSOCKET_URL = "ws://localhost:1000/qgpt/stream"
 TIMEOUT = 20  # seconds
@@ -30,7 +29,7 @@ class WebSocketManager:
     def on_message(self,ws, message):
         """Handle incoming websocket messages."""
         try:
-            response = pieces_os_client.QGPTStreamOutput.from_json(message)
+            response = pos_client.QGPTStreamOutput.from_json(message)
             if response.question:
                 answers = response.question.answers.iterable
                 for answer in answers:
@@ -76,19 +75,40 @@ class WebSocketManager:
 
     def send_message(self):
         """Send a message over the websocket."""
-        message = {
-            "question": {
-                "query": self.query,
-                "relevant": {"iterable": []},
-                "model": self.model_id
-            },
-            "conversation": self.conversation
-        }
-        json_message = json.dumps(message)
+        message = pos_client.QGPTStreamInput(
+            question = pos_client.QGPTQuestionInput(
+                query=self.query,
+                model=self.model_id,
+                relevant = pos_client.RelevantQGPTSeeds(
+                    iterable=[
+                        pos_client.RelevantQGPTSeed(
+                            seed = pos_client.Seed(
+                                type="SEEDED_ASSET",
+                                asset=pos_client.SeededAsset(
+                                    application=pos_client.Application(
+                                        id = "test",
+                                        name= pos_client.ApplicationNameEnum.UNKNOWN,
+                                        version = '0.0.1',
+                                        platform = pos_client.PlatformEnum.WINDOWS,
+                                        onboarded = False,
+                                        privacy = pos_client.PrivacyEnum.ANONYMOUS,
+                                    ),
+                                    format=pos_client.SeededFormat(
+                                        fragment = pos_client.SeededFragment(
+                                            string = pos_client.TransferableString(raw = self.raw)
+                                        ),
+                                    ),
+                                ), 
+                            ),
+                        )
+                    ]
+                ),
+            ),
+            conversation = self.conversation).to_json()
 
         if self.is_connected:
             try:
-                self.ws.send(json_message)
+                self.ws.send(message)
             except websocket.WebSocketException as e:
                 print(f"Error sending message: {e}")
         else:
@@ -101,11 +121,12 @@ class WebSocketManager:
             self.ws.close()
             self.is_connected = False
 
-    def ask_question(self, model_id, query,verbose = True):
+    def ask_question(self, model_id, query,raw):
         """Ask a question using the websocket."""
         self.final_answer = ""
         self.model_id = model_id
         self.query = query
+        self.raw = raw
         self.send_message()
         finishes = self.message_compeleted.wait(TIMEOUT)
         self.message_compeleted.clear()

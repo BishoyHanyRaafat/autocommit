@@ -35,29 +35,24 @@ def get_current_working_changes(word_limit:int=2000) -> str:
             summary += "Deletion: " + line[1:].strip() + "\n"
     
     
-    # Truncate the summary to the specified word limit
-    truncated_summary = summary[:word_limit-340] # removeing 340 characters because of the prompt characters
-    return truncated_summary
+    return summary
 
 
 def git_commit(**kwargs):
     changes_summary = get_current_working_changes(word_limit)
-    prompt = f"""Generate a concise git commit message written in present tense for the following code diff with the given specifications below:',
+    prompt = f"""Generate a concise git commit message **using best git commit message practices** to follow these specifications:',
 		`Message language: English`,
-		`Commit message must be a maximum of 72 characters.`,
-		`Exclude anything unnecessary such as translation, your git commit. Your entire response will be passed directly into git commit without **any edits**`,
-        Here are the changes lists:\n{changes_summary}"""
+        `Format of the message: "(task done): small description"`,
+        `task done can be one from: "feat,fix,chore,refactor,docs,style,test,perf,ci,build,revert"`,
+        `Example of the message: "docs: add new guide on python"`,
+        `Output format WITHOUT ADDING ANYTHING ELSE: "message is **YOUR COMMIT MESSAGE HERE**"""
     try:
-        commit_message = ws_manager.ask_question(model_id,prompt,False)
+        commit_message = ws_manager.ask_question(model_id,prompt,changes_summary)
         # Remove extras
         # Remove leading and trailing quotes
-        commit_message = re.sub(r'^["\']|["\']$', '', commit_message)
-
-        # Remove markdown code block syntax
-        commit_message = re.sub(r'^```|```$', '', commit_message)
-
-        # Remove leading 'plaintext'
-        commit_message = re.sub(r'^plaintext', '', commit_message)
+        commit_message = commit_message.replace("message is","",1)
+        for _ in range(2):# Remove leading bold and italic * characters
+            commit_message = commit_message[1:-1] if commit_message.startswith("*") else commit_message
 
         # Remove leading and trailing whitespace
         commit_message = commit_message.strip()
