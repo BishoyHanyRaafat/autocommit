@@ -3,7 +3,7 @@ import re
 from config import word_limit,model_id,api_client,pos_client
 from pieces_websocket import WebSocketManager
 ws_manager = WebSocketManager()
-def get_current_working_changes(word_limit:int=2000) -> str:
+def get_current_working_changes() -> str:
     """
     Fetches the detailed changes in the files you are currently working on, limited to a specific word count.
     
@@ -39,13 +39,13 @@ def get_current_working_changes(word_limit:int=2000) -> str:
 
 
 def git_commit(**kwargs):
-    changes_summary = get_current_working_changes(word_limit)
+    changes_summary = get_current_working_changes()
     prompt = f"""Generate a concise git commit message **using best git commit message practices** to follow these specifications:',
-		`Message language: English`,
-        `Format of the message: "(task done): small description"`,
-        `task done can be one from: "feat,fix,chore,refactor,docs,style,test,perf,ci,build,revert"`,
-        `Example of the message: "docs: add new guide on python"`,
-        `Output format WITHOUT ADDING ANYTHING ELSE: "message is **YOUR COMMIT MESSAGE HERE**"""
+                `Message language: English`,
+                `Format of the message: "(task done): small description"`,
+                `task done can be one from: "feat,fix,chore,refactor,docs,style,test,perf,ci,build,revert"`,
+                `Example of the message: "docs: add new guide on python"`,
+                `Output format WITHOUT ADDING ANYTHING ELSE: "message is **YOUR COMMIT MESSAGE HERE**"""
     try:
         commit_message = ws_manager.ask_question(model_id,prompt,changes_summary)
         # Remove extras
