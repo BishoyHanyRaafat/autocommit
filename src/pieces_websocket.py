@@ -2,6 +2,8 @@
 import websocket
 import threading
 import pieces_os_client as pos_client
+from typing import List
+from applications import get_application
 
 WEBSOCKET_URL = "ws://localhost:1000/qgpt/stream"
 TIMEOUT = 20  # seconds
@@ -75,33 +77,27 @@ class WebSocketManager:
 
     def send_message(self):
         """Send a message over the websocket."""
+        iterable = []
+        for raw in self.raw:
+            iterable.append(pos_client.RelevantQGPTSeed(
+                seed = pos_client.Seed(
+                    type="SEEDED_ASSET",
+                    asset=pos_client.SeededAsset(
+                        application=get_application(),
+                        format=pos_client.SeededFormat(
+                            fragment = pos_client.SeededFragment(
+                                string = pos_client.TransferableString(raw = raw)
+                            ),
+                        ),
+                    ), 
+                ),
+            ))
         message = pos_client.QGPTStreamInput(
             question = pos_client.QGPTQuestionInput(
                 query=self.query,
                 model=self.model_id,
                 relevant = pos_client.RelevantQGPTSeeds(
-                    iterable=[
-                        pos_client.RelevantQGPTSeed(
-                            seed = pos_client.Seed(
-                                type="SEEDED_ASSET",
-                                asset=pos_client.SeededAsset(
-                                    application=pos_client.Application(
-                                        id = "test",
-                                        name= pos_client.ApplicationNameEnum.UNKNOWN,
-                                        version = '0.0.1',
-                                        platform = pos_client.PlatformEnum.WINDOWS,
-                                        onboarded = False,
-                                        privacy = pos_client.PrivacyEnum.ANONYMOUS,
-                                    ),
-                                    format=pos_client.SeededFormat(
-                                        fragment = pos_client.SeededFragment(
-                                            string = pos_client.TransferableString(raw = self.raw)
-                                        ),
-                                    ),
-                                ), 
-                            ),
-                        )
-                    ]
+                    iterable=iterable
                 ),
             ),
             conversation = self.conversation).to_json()
@@ -121,8 +117,18 @@ class WebSocketManager:
             self.ws.close()
             self.is_connected = False
 
-    def ask_question(self, model_id, query,raw):
-        """Ask a question using the websocket."""
+    def ask_question(self, model_id:str, query:str,raw:List[str]=None) -> str:
+        """
+        Ask a question using the websocket.
+        
+        Args:
+            model_id (str): The ID of the model to use.
+            query (str): The question to ask.
+            raw (list): which represet the context that will be sent to the model as a list of strings.
+        
+        Returns:
+            The answer to the question.
+        """
         self.final_answer = ""
         self.model_id = model_id
         self.query = query

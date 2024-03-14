@@ -7,12 +7,8 @@ def get_current_working_changes() -> str:
     """
     Fetches the detailed changes in the files you are currently working on, limited to a specific word count.
     
-    Args:
-        word_limit (int): The maximum number of words to include in the summary.
-    
     Returns:
-        A string summarizing the detailed changes in a format suitable for generating commit messages,
-        truncated to the specified word limit.
+        A string summarizing the detailed changes in a format suitable for generating commit messages.
     """
     
     result = subprocess.run(["git", "diff"], capture_output=True, text=True)
@@ -40,22 +36,23 @@ def get_current_working_changes() -> str:
 
 def git_commit(**kwargs):
     changes_summary = get_current_working_changes()
-    prompt = f"""Generate a concise git commit message **using best git commit message practices** to follow these specifications:',
+    prompt = f"""Generate a concise git commit message **using best git commit message practices** to follow these specifications:'
                 `Message language: English`,
                 `Format of the message: "(task done): small description"`,
                 `task done can be one from: "feat,fix,chore,refactor,docs,style,test,perf,ci,build,revert"`,
                 `Example of the message: "docs: add new guide on python"`,
-                `Output format WITHOUT ADDING ANYTHING ELSE: "message is **YOUR COMMIT MESSAGE HERE**"""
+                `Output format WITHOUT ADDING ANYTHING ELSE: "message is **YOUR COMMIT MESSAGE HERE**`,
+                `Note: Don't generate a general commiting message make it more relevant to the changes`."""
     try:
-        commit_message = ws_manager.ask_question(model_id,prompt,changes_summary)
-        # Remove extras
-        # Remove leading and trailing quotes
-        commit_message = commit_message.replace("message is","",1)
-        for _ in range(2):# Remove leading bold and italic * characters
-            commit_message = commit_message[1:-1] if commit_message.startswith("*") else commit_message
+        commit_message = ws_manager.ask_question(model_id,prompt,[changes_summary])
 
+        # Remove extras from the commit message
+        commit_message = commit_message.replace("message is","",1) # Remove the "message is" part as mentioned in the prompt
+        commit_message = commit_message.replace('*', '') # Remove the bold and italic characters
         # Remove leading and trailing whitespace
         commit_message = commit_message.strip()
+
+        # Delete the converstation
         pos_client.ConversationsApi(api_client).conversations_delete_specific_conversation(conversation=ws_manager.conversation)
     except Exception as e:
         print("Error in getting the commit message",e)
