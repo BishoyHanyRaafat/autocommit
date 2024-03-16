@@ -31,9 +31,14 @@ Pieces autocommit tool is very powerful tool that can be used to automate commit
    ```
 
 3. Run the following command
-   ```python
+   ```bash
    python src
    ```
+   or if you install the project via pip
+   ```bash
+   python autocommit
+   ```
+
 ## Dependencies
 
 - websocket
