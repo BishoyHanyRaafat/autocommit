@@ -129,6 +129,7 @@ class WebSocketManager:
         Returns:
             The answer to the question.
         """
+        assert isinstance(raw,list)
         self.final_answer = ""
         self.model_id = model_id
         self.query = query
@@ -140,3 +141,5 @@ class WebSocketManager:
             raise ConnectionError("Failed to get the reponse back")
         self.close_websocket_connection()
         return self.final_answer
+    
+
