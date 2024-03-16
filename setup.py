@@ -14,10 +14,10 @@ setup(
     install_requires=parse_requirements('requirements.txt'),
     long_description=open('README.md').read() if exists('README.md') else '',
     entry_points={
-        'console_scripts': ['autocommit = src.__main__:main']
+        'console_scripts': ['autocommit = autocommit.__main__:main']
     },
     python_requires=">=3.9",
-    keywords=['CLI', 'cli', 'autocommit', 'autocommit-cli', 'autocommit-client', 'autocommit-client-cli'],
+    keywords=['CLI', 'cli', 'autocommit', 'autocommit-cli', 'autocommit-client', 'autocommit-client-cli','pieces'],
     classifiers=['Operating System :: OS Independent',
                  'Programming Language :: Python :: 3',
                  'Intended Audience :: Developers',
