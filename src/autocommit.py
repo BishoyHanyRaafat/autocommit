@@ -57,9 +57,19 @@ def git_commit(**kwargs):
     except Exception as e:
         print("Error in getting the commit message",e)
         return
-    print(f"The generated commit message is: {commit_message}")
-    r = input("Are you sure you want commit these changes? (y/n): ")
-    if r.lower() == "y":
+    
+
+    # Check if the user wants to commit the changes or change the commit message
+    r_message = r_message = input(f"The generated commit message is:\n\n {commit_message}\n\nAre you sure you want to commit these changes?\n\n- y: Yes\n- n: No\n- c: Change the commit message\n\nPlease enter your choice (y/n/c): ")
+    
+    if r_message.lower() == "y" or r_message.lower() == "c":
+
+        # Changing the commit message if the user wants to
+        if r_message.lower() == "c":
+            edit = input(f"Enter the new commit message [generated message is: '{commit_message}']: ")
+            if edit:
+                commit_message = edit
+
         try:
             subprocess.run(["git", "add", "."], check=True)
             subprocess.run(["git", "commit", "-m", commit_message], check=True)
