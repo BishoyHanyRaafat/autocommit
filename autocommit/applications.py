@@ -1,5 +1,5 @@
 import platform
-from config import api_client,pos_client
+from .config import api_client,pos_client
 import json
 def categorize_os():
     # Get detailed platform information

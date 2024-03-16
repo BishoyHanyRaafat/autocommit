@@ -1,8 +1,8 @@
 import subprocess
 import re
-from config import model_id,api_client,pos_client
-from pieces_websocket import WebSocketManager
-from git_api import get_repo_issues
+from .config import model_id,api_client,pos_client
+from .pieces_websocket import WebSocketManager
+from .git_api import get_repo_issues
 from typing import Optional,Tuple
 
 

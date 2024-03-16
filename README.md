@@ -32,7 +32,7 @@ Pieces autocommit tool is very powerful tool that can be used to automate commit
 
 3. Run the following command
    ```bash
-   python autocommit
+   python -m autocommit
    ```
    or if you install the project via pip
    ```bash

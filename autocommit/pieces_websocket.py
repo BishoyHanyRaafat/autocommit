@@ -3,7 +3,7 @@ import websocket
 import threading
 import pieces_os_client as pos_client
 from typing import List
-from applications import get_application
+from .applications import get_application
 
 WEBSOCKET_URL = "ws://localhost:1000/qgpt/stream"
 TIMEOUT = 20  # seconds
