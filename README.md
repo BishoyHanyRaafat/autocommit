@@ -22,7 +22,7 @@ Pieces autocommit tool is very powerful tool that can be used to automate commit
 
 2. Install the dependencies:
 
-   ```python
+   ```bash
    pip install pieces_os_client websocket
    ```
    or 
@@ -30,6 +30,10 @@ Pieces autocommit tool is very powerful tool that can be used to automate commit
    pip install -r requirements.txt
    ```
 
+3. Run the following command
+   ```python
+   python src
+   ```
 ## Dependencies
 
 - websocket

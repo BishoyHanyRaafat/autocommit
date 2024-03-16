@@ -66,7 +66,7 @@ def get_current_working_changes() -> str:
     return summary
 
 
-def git_commit(**kwargs):
+def git_commit():
     changes_summary = get_current_working_changes()
     message_prompt = f"""Generate a concise git commit message **using best git commit message practices** to follow these specifications:
                 `Message language: English`,
@@ -115,8 +115,6 @@ def git_commit(**kwargs):
         except:
             issue_number = None
 
-
-
         # Delete the converstation
         pos_client.ConversationsApi(api_client).conversations_delete_specific_conversation(conversation=ws_manager.conversation)
     
@@ -150,8 +148,6 @@ def git_commit(**kwargs):
             print("Successfully committed with message:", commit_message)
         except subprocess.CalledProcessError as e:
             print("Failed to commit changes:", e)
-        if kwargs["push"]:
-            subprocess.run(["git", "push"], check=True)
     else:
         print("Committing changes cancelled")
 
