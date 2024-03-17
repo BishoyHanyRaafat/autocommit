@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 
 
 
-def get_repo_issues(repo_owner:str, repo_name:str) -> Optional[List[Dict[str, str]]]:
+def get_repo_issues(repo_owner:str, repo_name:str) -> List[Optional[Dict[str, str]]]:
     """
     This function searches for issues in a public GitHub repository using the search API.
     Args:
@@ -27,13 +27,13 @@ def get_repo_issues(repo_owner:str, repo_name:str) -> Optional[List[Dict[str, st
 
     
     if data.get('total_count', 0) == 0:
-        return None
+        return []
     
 
     # Extract issue titles and URLs from search results
     issues = []
 
-    for item in data['items']:
+    for item in data.get('items',[]):
         # Skip closed issues
         if item['state'] != 'open':
             continue
