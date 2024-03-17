@@ -43,3 +43,42 @@ Pieces autocommit tool is very powerful tool that can be used to automate commit
 
 - websocket
 - pieces_os_client
+
+
+## Overview
+This tool is designed to automate the process of committing changes to your codebase. It not only commits your changes but also generates a commit message for you. If there is an issue related to the commit, the tool will automatically add the issue number to the commit message.
+
+The tool automatically commits changes made to the codebase. This eliminates the need for manual intervention, making the process more efficient and less prone to errors.
+
+## Features
+
+### Commit Message Generation
+The tool generates a commit message for each commit. This feature is designed to provide meaningful context for each commit without the need for manual input.
+
+### Issue Number Addition
+If there is an issue related to the commit, the tool will automatically add the issue number to the commit message. This helps in tracking the progress of issues and linking commits to specific issues.
+
+## Demo
+```plaintext
+The generated commit message is:
+
+ Add: the issue name to the commiting message
+
+Are you sure you want to commit these changes?
+
+- y: Yes
+- n: No
+- c: Change the commit message
+
+Please enter your choice (y/n/c): y
+Issue Number:  1
+Issue Title:  Add the issue number at the end of the committing message
+Is this issue related to the commit? (y/n): y
+[main d266c2f] Add: the issue name to the commiting message (issue: #1)
+ 2 files changed, 27 insertions(+), 25 deletions(-)
+```
+And now you are ready to push your changes 🎉🎉.
+
+## Additional Resources
+- [Issues](https://github.com/BishoyHanyRaafat/autocommit/issues)
+- [GitHub](https://github.com/BishoyHanyRaafat/autocommit)
