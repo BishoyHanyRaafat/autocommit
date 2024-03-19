@@ -16,7 +16,7 @@ def get_repo_issues(repo_owner:str, repo_name:str) -> List[Optional[Dict[str, st
         list: A list of dictionaries of opened issues containing basic information about issues (number,title, body).
         Returns None if no issues are found.
     """
-    params = {'q': f'is:issue repo:{repo_owner}/{repo_name}', 'per_page': '100'}
+    params = {'q': f'is:issue is:open repo:{repo_owner}/{repo_name}', 'per_page': '100'}
     query_string = urlencode(params)
     url = f"https://api.github.com/search/issues?{query_string}"
 
