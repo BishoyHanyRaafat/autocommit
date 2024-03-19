@@ -30,6 +30,12 @@ Pieces autocommit tool is very powerful tool that can be used to automate commit
    pip install -r requirements.txt
    ```
 
+3. Stage the changes:
+   
+   ```bash
+   git add .
+   ```
+
 3. Run the following command
    ```bash
    python -m autocommit
@@ -46,7 +52,7 @@ Pieces autocommit tool is very powerful tool that can be used to automate commit
 
 
 ## Overview
-This tool is designed to automate the process of committing changes to your codebase. It not only commits your changes but also generates a commit message for you. If there is an issue related to the commit, the tool will automatically add the issue number to the commit message.
+This tool is designed to automate the process of committing changes to your codebase. It not only commits your staged changes but also generates a commit message for you. If there is an issue related to the commit, the tool will automatically add the issue number to the commit message.
 
 The tool automatically commits changes made to the codebase. This eliminates the need for manual intervention, making the process more efficient and less prone to errors.
 

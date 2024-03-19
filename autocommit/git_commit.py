@@ -18,9 +18,13 @@ def get_git_repo_name() -> Optional[Tuple[str]]:
         A tuple containing a string representing the username and repository name.
     """
     try:
-        # Get the remote origin URL of the git repository
-        repo_url = subprocess.check_output(["git", "config", "--get", "remote.origin.url"]).decode('utf-8').strip()
-        
+        try:
+            # Get the remote origin URL of the git repository upstream url
+            repo_url = subprocess.check_output(["git", "config", "--get", "remote.upstream.url"]).decode('utf-8').strip()
+
+        except:
+            repo_url = subprocess.check_output(["git", "config", "--get", "remote.origin.url"]).decode('utf-8').strip()
+            
         # Extract the username and repository name from the URL
         repo_info = repo_url.split('/')[-2:]
         username, repo_name = repo_info[0], repo_info[1].replace('.git', '')
@@ -41,7 +45,7 @@ def get_current_working_changes() -> str:
         A string summarizing the detailed changes in a format suitable for generating commit messages.
     """
     
-    result = subprocess.run(["git", "diff"], capture_output=True, text=True)
+    result = subprocess.run(["git", "diff","--staged"], capture_output=True, text=True)
     if not result.stdout.strip():
         raise ValueError("No changes to commit or there is no .git file initialized in the current directory")
     detailed_diff = result.stdout.strip()
@@ -145,7 +149,6 @@ def git_commit():
             if r_issue.lower() == "y":
                 commit_message += f" (issue: #{issue_number})"
         try:
-            subprocess.run(["git", "add", "."], check=True)
             subprocess.run(["git", "commit", "-m", commit_message], check=True)
             print("Successfully committed with message:", commit_message)
         except subprocess.CalledProcessError as e:
