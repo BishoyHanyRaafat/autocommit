@@ -11,36 +11,18 @@ Pieces autocommit tool is very powerful tool that can be used to automate commit
 
 ## Getting Started
 
-1. Clone the repository:
-
+1. Install the project
    ```bash
-   git clone https://github.com/BishoyHanyRaafat/autocommit.git
-   ```
-2. Prerequisites: 
-   
-   - python 3.9.0+ version
-
-2. Install the dependencies:
-
-   ```bash
-   pip install pieces_os_client websocket
-   ```
-   or 
-   ```
-   pip install -r requirements.txt
+   pip install git+https://github.com/BishoyHanyRaafat/autocommit.git
    ```
 
-3. Stage the changes:
+2. Stage the changes:
    
    ```bash
    git add .
    ```
 
-3. Run the following command
-   ```bash
-   python -m autocommit
-   ```
-   or if you install the project via pip
+3. Generate the commit message:
    ```bash
    autocommit
    ```
