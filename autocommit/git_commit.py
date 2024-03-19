@@ -106,11 +106,12 @@ def git_commit():
             ]
             issue_prompt_text = "\n".join(issue_list) # To string
             
-            issue_number = ws_manager.ask_question(model_id, issue_prompt.format(issues=issue_prompt_text), [changes_summary])
-            # Extract the issue part
-            issue_number = issue_number.replace("Issue: ", "") 
+            
 
             try: 
+                issue_number = ws_manager.ask_question(model_id, issue_prompt.format(issues=issue_prompt_text), [changes_summary])
+                # Extract the issue part
+                issue_number = issue_number.replace("Issue: ", "") 
                 # If the issue is a number 
                 issue_number = int(issue_number)
                 issue_title = next((issue["title"] for issue in issues if issue["number"] == issue_number), None)
