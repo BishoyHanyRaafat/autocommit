@@ -1,6 +1,9 @@
 import platform
 from .config import api_client,pos_client
-import json
+from . import __version__
+
+application = None
+
 def categorize_os():
     # Get detailed platform information
     platform_info = platform.platform()
@@ -16,39 +19,19 @@ def categorize_os():
         os_info = 'WEB'  # Default to WEB if the OS doesn't match others
 
     return os_info
-def get_application() -> pos_client.Application:
-    well_known_instance = pos_client.WellKnownApi(api_client)
-
-    # Make Sure Server is Running and Get Version
-    version = well_known_instance.get_well_known_version()
-
+def connect_api() -> pos_client.Application:
+    global application
     # Decide if it's Windows, Mac, Linux or Web
     local_os = categorize_os()
 
-    # Check the database for an existing application
-    application_id = "DEFAULT"  # Replace with a default application ID
 
-    application = pos_client.Application(id=application_id, name="OPEN_SOURCE", version=version, platform=local_os, onboarded=False, privacy="OPEN")
-    
-    return application
-
-def is_registered():
-    applications_api = pos_client.ApplicationsApi(api_client)
-
-    apps_raw = applications_api.applications_snapshot()
-    apps_json = json.loads(apps_raw.json())["iterable"]
-    for app in apps_json:
-        if app["name"] == "OPEN_SOURCE":
-            return True
-    return False
-
-def register_application():
-    """Register an application if it is not registered"""
-    applications_api = pos_client.ApplicationsApi(api_client)
-
-    if not is_registered():
-        application = get_application()
-        api_response = applications_api.applications_register(application=application)
-        return api_response
+    api_instance = pos_client.ConnectorApi(api_client)
+    seeded_connector_connection = pos_client.SeededConnectorConnection(
+        application=pos_client.SeededTrackedApplication(
+            name = pos_client.ApplicationNameEnum.OPEN_SOURCE,
+            platform = local_os,
+            version = __version__))
+    api_response = api_instance.connect(seeded_connector_connection=seeded_connector_connection)
+    application =  api_response.application
 
 

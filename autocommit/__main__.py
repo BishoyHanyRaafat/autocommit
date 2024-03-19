@@ -1,8 +1,8 @@
 from .git_commit import git_commit
-from .applications import register_application
+from .applications import connect_api
 import sys
 def main():
-    register_application()
+    connect_api()
     git_commit()
     sys.exit(0)
 

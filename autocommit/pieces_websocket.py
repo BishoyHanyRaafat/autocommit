@@ -3,7 +3,7 @@ import websocket
 import threading
 import pieces_os_client as pos_client
 from typing import List
-from .applications import get_application
+from . import applications
 
 WEBSOCKET_URL = "ws://localhost:1000/qgpt/stream"
 TIMEOUT = 20  # seconds
@@ -83,7 +83,7 @@ class WebSocketManager:
                 seed = pos_client.Seed(
                     type="SEEDED_ASSET",
                     asset=pos_client.SeededAsset(
-                        application=get_application(),
+                        application=applications.application,
                         format=pos_client.SeededFormat(
                             fragment = pos_client.SeededFragment(
                                 string = pos_client.TransferableString(raw = raw)
