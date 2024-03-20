@@ -1,6 +1,6 @@
 import subprocess
 import re
-from .config import model_id,api_client,pos_client
+from .config import api_client,pos_client
 from .pieces_websocket import WebSocketManager
 from .git_api import get_repo_issues
 from typing import Optional,Tuple
@@ -47,28 +47,46 @@ def get_current_working_changes() -> str:
     
     result = subprocess.run(["git", "diff","--staged"], capture_output=True, text=True)
     if not result.stdout.strip():
-        raise ValueError("No changes to commit or there is no .git file initialized in the current directory")
+        print()
+        raise ValueError("No changes found","Please make sure you have added some files to your staging area")
     detailed_diff = result.stdout.strip()
-
     
+    # Create a summary of the changes
     summary = ""
-    for line in detailed_diff.split('\n'):
+
+    lines_diff = detailed_diff.split("\n")
+
+    add_changes_statment = False
+    changes_statment = "Here are the following additions and deletions to {file_name}:\n"
+    for idx,line in enumerate(lines_diff):
         if line.startswith('diff --git'):
             file_changed = re.search(r'diff --git a/(.+) b/\1', line)
-            if file_changed.group(1).endswith("poetry.lock"):
-                continue
+            # if file_changed.group(1).endswith("poetry.lock"):
+            #     continue
             if file_changed:
-                summary += f"File changed: **{file_changed.group(1)}**\n"
+                file_name = file_changed.group(1)
+                if lines_diff[idx+1] == "new file mode 100644":
+                    summary += f"File created: **{file_name}**\n"
+                elif lines_diff[idx+1] == "deleted file mode 100644":
+                    summary += f"File deleted: **{file_name}**\n"
+                else:
+                    summary += f"File modified: **{file_name}**\n"
+                add_changes_statment = True
         elif line.startswith('+') and not line.startswith('+++'):
+            if add_changes_statment:
+                summary += changes_statment.format(file_name = file_name)
+                add_changes_statment = False
             summary += "Addition: " + line[1:].strip() + "\n"
         elif line.startswith('-') and not line.startswith('---'):
+            if add_changes_statment:
+                summary += changes_statment.format(file_name = file_name)
+                add_changes_statment = False
             summary += "Deletion: " + line[1:].strip() + "\n"
-    
     
     return summary
 
 
-def git_commit():
+def git_commit(model_id):
     changes_summary = get_current_working_changes()
     message_prompt = f"""Generate a concise git commit message **using best git commit message practices** to follow these specifications:
                 `Message language: English`,
@@ -131,7 +149,7 @@ def git_commit():
     
 
     # Check if the user wants to commit the changes or change the commit message
-    r_message = r_message = input(f"The generated commit message is:\n\n {commit_message}\n\nAre you sure you want to commit these changes?\n\n- y: Yes\n- n: No\n- c: Change the commit message\n\nPlease enter your choice (y/n/c): ")
+    r_message = input(f"The generated commit message is:\n\n {commit_message}\n\nAre you sure you want to commit these changes?\n\n- y: Yes\n- n: No\n- c: Change the commit message\n\nPlease enter your choice (y/n/c): ")
     
     if r_message.lower() == "y" or r_message.lower() == "c":
 
