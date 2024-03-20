@@ -12,18 +12,18 @@ Pieces autocommit tool is very powerful tool that can be used to automate commit
 ## Getting Started
 
 1. Install the project
-   ```bash
+   ```shell
    pip install git+https://github.com/BishoyHanyRaafat/autocommit.git
    ```
 
 2. Stage the changes:
    
-   ```bash
+   ```shell
    git add .
    ```
 
 3. Generate the commit message:
-   ```bash
+   ```shell
    autocommit
    ```
 
