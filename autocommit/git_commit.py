@@ -90,23 +90,25 @@ def git_commit(model_id):
                 `Format of the message: "(task done): small description"`,
                 `task done can be one from: "feat,fix,chore,refactor,docs,style,test,perf,ci,build,revert"`,
                 `Example of the message: "docs: add new guide on python"`,
-                "`Output format WITHOUT ADDING ANYTHING ELSE: message is **YOUR COMMIT MESSAGE HERE**`",
-                `Note: Don't generate a general commiting message make it more relevant to the changes`."""
+                `Output format WITHOUT ADDING ANYTHING ELSE: message is **YOUR COMMIT MESSAGE HERE**`",
+                `Note: Don't generate a general commiting message make it more relevant to the changes`.
+                `Here are the changes summary:`\n{changes_summary}"""
 
     issue_prompt = """Please provide the issue number that is related to the changes, If nothing related write 'None'.
                     `Output format WITHOUT ADDING ANYTHING ELSE: "Issue: **ISSUE NUMBER OR NONE HERE**`,
                     `Example: 'Issue: 12', 'Issue: None'`,
-                    `Note: Don't provide any other information`"""
+                    `Note: Don't provide any other information`
+                    `Here are the issues:`\n{issues}"""
     try:
-
-        # Context
-        context_commit = pos_client.QGPTApi(api_client).relevance(pos_client.QGPTRelevanceInput(query=changes_summary,paths=os.getcwd(),application=applications.application.id,model=model_id))
-        context_issue = pos_client.QGPTApi(api_client).relevance(pos_client.QGPTRelevanceInput(query=issue_list,paths=os.getcwd(),application=applications.application.id,model=model_id))
-
-        # Commiting message
-        commit_message = pos_client.QGPTApi(api_client=api_client).question(pos_client.QGPTQuestionInput(
-            query=message_prompt,relevant=context_commit,model=model_id
-        )).answers.iterable[0].text
+        commit_message = pos_client.QGPTApi(api_client).relevance(
+            pos_client.QGPTRelevanceInput(
+                query=message_prompt,
+                paths=[os.getcwd()],
+                application=applications.application.id,
+                model=model_id,
+                options=pos_client.QGPTRelevanceInputOptions(question=True)
+            )).answer.answers.iterable[0].text
+        
         # Remove extras from the commit message
         commit_message = commit_message.replace("message is","",1) # Remove the "message is" part as mentioned in the prompt
         commit_message = commit_message.replace('*', '') # Remove the bold and italic characters
@@ -127,9 +129,17 @@ def git_commit(model_id):
             issue_list = "\n".join(issue_list) # To string
             
             try:
-                issue_number = pos_client.QGPTApi(api_client=api_client).question(pos_client.QGPTQuestionInput(
-                                    query=issue_prompt,relevant=context_issue,model=model_id
-                                )).answers.iterable[0].text
+                
+                issue_number = commit_message = pos_client.QGPTApi(api_client).relevance(
+                        pos_client.QGPTRelevanceInput(
+                            query=issue_prompt.format(issues=issue_list),
+                            paths=[os.getcwd()],
+                            application=applications.application.id,
+                            model=model_id,
+                            options=pos_client.QGPTRelevanceInputOptions(question=True)
+                        )).answer.answers.iterable[0].text
+        
+                
                 # Extract the issue part
                 issue_number = issue_number.replace("Issue: ", "") 
                 # If the issue is a number 
