@@ -9,7 +9,7 @@ setup(
     author="Bishoy",
     name='pieces autocommit',
     url='https://github.com/BishoyHanyRaafat/autocommit/',
-    version='0.1.0',
+    version='0.2.0',
     packages=find_packages(),
     install_requires=parse_requirements('requirements.txt'),
     long_description=open('README.md').read() if exists('README.md') else '',
